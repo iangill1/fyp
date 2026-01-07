@@ -5,7 +5,7 @@ def main():
     company_news = news_retrieval("ttwo", "2025-01-01", "2026-01-01")
 
     print(company_data.tail())
-    print(company_news)  # Print first 5 news articles
+    print(company_news)
 
 if __name__ == "__main__":
     main()
