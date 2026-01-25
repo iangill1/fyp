@@ -8,6 +8,11 @@ import requests
 #load my env file
 load_dotenv()
 
+#set pandas display options
+pd.set_option('display.max_columns', None)
+pd.set_option('display.max_colwidth', None)
+pd.set_option('display.width', None)
+
 
 #retrieve historical stock price data from yfinance api
 def price_retrieval(ticker, start_date, end_date, interval):
@@ -51,4 +56,9 @@ def alpha_vantage_news_retrieval(ticker, start_date, end_date):
     response = requests.get(url, params)
     #parse json response
     data = response.json()
+    df = pd.DataFrame(data["feed"])
+    #convert time_published to datetime so it can be aligned with stock data
+    df["time_published"] = pd.to_datetime(df["time_published"], format="%Y%m%dT%H%M%S")
+    df = df[["time_published", "title", "summary"]]
+    print(df)
     return data
