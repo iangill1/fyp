@@ -4,6 +4,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error
 import matplotlib.pyplot as plt
 from data_retrieval import price_retrieval
 
+
 def naive_model_forecast(price_data):
     #download historical stock data for a company using yfinance api
     data = price_data
