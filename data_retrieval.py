@@ -26,6 +26,18 @@ def price_retrieval(ticker, start_date, end_date, interval):
     return data
 
 
+def price_retrieval_period(ticker, period, interval):
+    data = yf.download(ticker, period=period, interval=interval, auto_adjust=False)
+    #convert to datetime index
+    data.index = pd.to_datetime(data.index)
+    #set frequency to business day
+    if interval in ["1d", "5d", "1wk", "1mo", "3mo"]:
+        data = data.asfreq("B")
+        #forward fill missing data (holidays, etc)
+        data = data.ffill()
+    return data
+
+
 #retrieve news articles from finnhub api
 def finnhub_news_retrieval(ticker, start_date, end_date):
     #get my api key from env file
@@ -33,7 +45,12 @@ def finnhub_news_retrieval(ticker, start_date, end_date):
     #create finnhub client
     finnhub_client = finnhub.Client(api_key=finnhub_key)
     news = finnhub_client.company_news(ticker, _from=start_date, to=end_date)
-    return news
+    #convert to data frame
+    df = pd.DataFrame(news)
+    #convert time to readable datetime
+    df["datetime"] = pd.to_datetime(df["datetime"], unit="s")
+    df = df[["datetime", "headline", "summary"]]
+    return df
 
 
 #retrieve news articles from alpha vantage api
@@ -60,5 +77,4 @@ def alpha_vantage_news_retrieval(ticker, start_date, end_date):
     #convert time_published to datetime so it can be aligned with stock data
     df["time_published"] = pd.to_datetime(df["time_published"], format="%Y%m%dT%H%M%S")
     df = df[["time_published", "title", "summary"]]
-    print(df)
-    return data
+    return df
