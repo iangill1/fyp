@@ -59,3 +59,41 @@ def plot_trading_volume(price_data):
     plt.ylabel("Volume ($)")
     plt.grid(True)
     plt.show()
+
+
+def plot_actual_vs_predicted(price_data, predicted_data):
+    # make copy of data
+    actual = price_data.copy()
+    predicted = predicted_data.copy()
+
+    # error handling
+    if actual.empty:
+        raise ValueError("Price data is empty")
+    if predicted.empty:
+        raise ValueError("Predicted data is empty")
+
+    # get ticker symbol from dataframe and pass to graph title
+    if isinstance(actual.columns, pd.MultiIndex):
+        ticker = actual.columns.get_level_values(1)[0]
+        actual.columns = actual.columns.get_level_values(0)
+    else:
+        ticker = "Stock"
+
+    if "Close" not in actual.columns:
+        raise ValueError("Data does not contain 'Close' column")
+    if "Predicted" not in predicted.columns:
+        raise ValueError("Predicted data does not contain 'Predicted' column")
+
+    close_price = actual["Close"]
+    predicted_price = predicted["Predicted"]
+
+    # plot closing price over time
+    plt.figure(figsize=(12, 6))
+    plt.plot(actual.index, close_price, label="Actual Price")
+    plt.plot(predicted.index, predicted_price, label="Predicted Price", linestyle="--")
+    plt.title(f"{ticker} Actual vs Predicted Price")
+    plt.xlabel("Date")
+    plt.ylabel("Price ($)")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
