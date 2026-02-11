@@ -25,7 +25,7 @@ def plot_stock_price(price_data):
 
     #plot closing price over time
     plt.figure(figsize=(12, 6))
-    plt.plot(data.index, close_price.diff().diff())
+    plt.plot(data.index, close_price)
     plt.title(f"{ticker} Price Over Time")
     plt.xlabel("Date")
     plt.ylabel("Closing Price ($)")
