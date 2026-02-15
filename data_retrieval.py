@@ -81,7 +81,13 @@ def alpha_vantage_news_retrieval(ticker, start_date, end_date):
     # if neither title nor headline exist, create an empty headline column so selection below doesn't fail
     if "headline" not in df.columns:
         df["headline"] = None
+
+    if "time_published" in df.columns:
+        df.rename(columns={"time_published": "datetime"}, inplace=True)
+    if "datetime" not in df.columns:
+        df["datetime"] = None
+
     # convert time_published to datetime so it can be aligned with stock data
-    df["time_published"] = pd.to_datetime(df["time_published"], format="%Y%m%dT%H%M%S")
-    # df = df[["time_published", "headline", "summary", "relevance_score"]]
+    df["datetime"] = pd.to_datetime(df["datetime"], format="%Y%m%dT%H%M%S")
+    df = df[["datetime", "headline", "summary"]]
     return df
