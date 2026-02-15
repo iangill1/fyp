@@ -16,7 +16,7 @@ def naive_model_forecast(price_data):
         close_price = close_price.iloc[:, 0]
     close_price = close_price.astype(float)
 
-    #split data
+    # split data
     train_size = int(len(close_price) * 0.8)
     train_data = close_price.iloc[:train_size]
     test_data = close_price.iloc[train_size:]

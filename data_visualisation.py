@@ -4,14 +4,14 @@ import seaborn as sns
 
 
 def plot_stock_price(price_data):
-    #make copy of data
+    # make copy of data
     data = price_data.copy()
 
-    #error handling
+    # error handling
     if data.empty:
         raise ValueError("Price data is empty")
 
-    #get ticker symbol from dataframe and pass to graph title
+    # get ticker symbol from dataframe and pass to graph title
     if isinstance(data.columns, pd.MultiIndex):
         ticker = data.columns.get_level_values(1)[0]
         data.columns = data.columns.get_level_values(0)
@@ -23,7 +23,7 @@ def plot_stock_price(price_data):
 
     close_price = data["Close"]
 
-    #plot closing price over time
+    # plot closing price over time
     plt.figure(figsize=(12, 6))
     plt.plot(data.index, close_price)
     plt.title(f"{ticker} Price Over Time")
