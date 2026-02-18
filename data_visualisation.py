@@ -97,3 +97,45 @@ def plot_actual_vs_predicted(price_data, predicted_data):
     plt.legend()
     plt.grid(True)
     plt.show()
+
+
+def plot_sentiment_over_time(news_df):
+    """
+    Plot sentiment scores from news articles over time.
+    """
+    # make copy of data
+    data = news_df.copy()
+
+    # error handling
+    if data.empty:
+        raise ValueError("News data is empty")
+
+    if "sentiment_score" not in data.columns:
+        raise ValueError("Data does not contain 'sentiment_score' column")
+
+    if "datetime" not in data.columns:
+        raise ValueError("Data does not contain 'datetime' column")
+
+    # ensure datetime is datetime type
+    data["datetime"] = pd.to_datetime(data["datetime"])
+    data["date"] = data["datetime"].dt.date
+    # calculate average sentiment score per day
+    daily_sentiment = data.groupby("date")["sentiment_score"].mean().reset_index()
+    daily_sentiment["date"] = pd.to_datetime(daily_sentiment["date"])
+    daily_sentiment = daily_sentiment.sort_values("date")
+
+    #data = data.sort_values("datetime")
+
+    # plot sentiment scores over time
+    plt.figure(figsize=(12, 6))
+    #plt.scatter(data["datetime"], data["sentiment_score"], alpha=0.6)
+    plt.plot(daily_sentiment["date"], daily_sentiment["sentiment_score"], marker='o', alpha=0.6)
+    plt.axhline(y=0, color='r', linestyle='--', alpha=0.3, label='Neutral')
+    plt.title("Average Daily Sentiment Scores Over Time")
+    plt.xlabel("Date")
+    plt.ylabel("Average Sentiment Score")
+    plt.ylim(-1.1, 1.1)
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.show()
