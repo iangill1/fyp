@@ -17,14 +17,10 @@ def analyse_sentiment(news_df):
 
     texts = df["combined_text"].tolist()
 
-    # Use GPU if available, otherwise CPU
-    device = 0 if torch.cuda.is_available() else -1
-
     sentiment_model = pipeline(
         "sentiment-analysis",
         model="ProsusAI/finbert",
-        tokenizer="ProsusAI/finbert",
-        device=device
+        tokenizer="ProsusAI/finbert"
     )
 
     labels = []
