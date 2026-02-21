@@ -1,6 +1,5 @@
 import pandas as pd
 from transformers import pipeline
-import torch
 
 
 def analyse_sentiment(news_df):

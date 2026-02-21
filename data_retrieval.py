@@ -23,6 +23,7 @@ def price_retrieval(ticker, start_date, end_date, interval):
     data = data.asfreq("B")
     # forward fill missing data (holidays, etc)
     data = data.ffill()
+    print(data)
     return data
 
 
@@ -35,7 +36,21 @@ def price_retrieval_period(ticker, period, interval):
         data = data.asfreq("B")
         # forward fill missing data (holidays, etc)
         data = data.ffill()
+    print(data)
     return data
+
+
+def price_retrieval_history(ticker, start_date, end_date, interval):
+    ticker = yf.Ticker(ticker)
+    df = ticker.history(start=start_date, end=end_date, interval=interval, auto_adjust=False)
+    # convert to datetime index
+    df.index = pd.to_datetime(df.index)
+    # set frequency to business day
+    df = df.asfreq("B")
+    # forward fill missing data (holidays, etc)
+    df = df.ffill()
+    print(df)
+    return df
 
 
 # retrieve news articles from finnhub api
@@ -50,6 +65,7 @@ def finnhub_news_retrieval(ticker, start_date, end_date):
     # convert time to readable datetime
     df["datetime"] = pd.to_datetime(df["datetime"], unit="s")
     df = df[["datetime", "headline", "summary"]]
+    print(df)
     return df
 
 
