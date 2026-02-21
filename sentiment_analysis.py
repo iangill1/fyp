@@ -2,6 +2,18 @@ import pandas as pd
 from transformers import pipeline
 
 
+def finbert_eval(text):
+    sentiment_model = pipeline(
+        "sentiment-analysis",
+        model = "ProsusAI/finbert",
+        tokenizer = "ProsusAI/finbert"
+    )
+
+    result = sentiment_model(text)
+
+    return result
+
+
 def analyse_sentiment(news_df):
     # If the DataFrame is empty, just return it
     if news_df is None or news_df.empty:
