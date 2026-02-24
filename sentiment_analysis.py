@@ -36,6 +36,10 @@ def analyse_sentiment(news_df):
 
     labels = []
     scores = []
+    article_count = 0
+    positive_count = 0
+    negative_count = 0
+    neutral_count = 0
 
     # Process in small batches
     batch_size = 16
@@ -44,23 +48,36 @@ def analyse_sentiment(news_df):
         results = sentiment_model(batch)
 
         for result in results:
+            article_count += 1
             label = result["label"]
             score = result["score"]
 
             if label.lower() == "positive":
                 sentiment_value = score
+                positive_count += 1
             elif label.lower() == "negative":
                 sentiment_value = -score
+                negative_count += 1
             else:
                 sentiment_value = 0
+                neutral_count += 1
 
             labels.append(label)
             scores.append(sentiment_value)
+
+    positive_percent = round((positive_count / article_count) * 100, 2)
+    negative_percent = round((negative_count / article_count) * 100, 2)
+    neutral_percent = round((neutral_count / article_count) * 100, 2)
 
     df["sentiment_label"] = labels
     df["sentiment_score"] = scores
 
     # Remove temporary column
     df.drop(columns=["combined_text"], inplace=True)
+
+    print("Total articles analysed: ", article_count)
+    print(f"Positive: {positive_count}   ({positive_percent}%)")
+    print(f"Negative: {negative_count}  ({negative_percent}%)")
+    print(f"Neutral: {neutral_count}  ({neutral_percent}%)")
 
     return df
