@@ -71,6 +71,9 @@ def finnhub_news_retrieval(ticker, start_date, end_date):
 
 # retrieve news articles from alpha vantage api
 def alpha_vantage_news_retrieval(ticker, start_date, end_date):
+    # convert dates to make them compatible with alpha vantage
+    start_date = start_date.replace("-", "") + "T0000"
+    end_date = end_date.replace("-", "") + "T2359"
     # get api key from env file
     alpha_vantage_key = os.getenv("ALPHA_VANTAGE_API_KEY")
     # make request to alpha vantage news sentiment endpoint
