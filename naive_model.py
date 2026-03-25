@@ -52,6 +52,7 @@ def naive_sentiment_forecast(price_data, news_sentiment):
     close_price = price_data["Close"]
     if isinstance(close_price, pd.DataFrame):
         close_price = close_price.iloc[:, 0]
+
     close_price = close_price.astype(float)
 
     # aggregate sentiment scores by date
@@ -60,6 +61,10 @@ def naive_sentiment_forecast(price_data, news_sentiment):
     news_data.index = news_data.index.normalize()
 
     average_sentiment = news_data["sentiment_score"].groupby(news_data.index).mean()
+
+    sentiment_lag = 3
+    average_sentiment_lagged = average_sentiment.shift(sentiment_lag)
+
     price_dates = pd.to_datetime(price_data.index).normalize()
 
     # split data
@@ -74,8 +79,8 @@ def naive_sentiment_forecast(price_data, news_sentiment):
         current_date = price_dates[train_size + t]
 
         if current_date in average_sentiment.index:
-            sentiment_score = average_sentiment[current_date]
-            sentiment_adjustment = sentiment_score * last_price * 0.05
+            sentiment_score = float(average_sentiment_lagged.loc[current_date])
+            sentiment_adjustment = sentiment_score * last_price * 0.001
             prediction = last_price + sentiment_adjustment
         else:
             prediction = last_price
