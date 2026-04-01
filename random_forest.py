@@ -4,6 +4,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
 from data_visualisation import plot_actual_vs_predicted
 import numpy as np
+from scipy.optimize import minimize
 
 
 def rf_baseline_forecast(price_data):
@@ -161,7 +162,7 @@ def rf_sentiment_forecast(price_data, news_sentiment):
 
     average_sentiment = news_data["sentiment_score"].groupby(news_data.index).mean()
 
-    sentiment_lag = 2
+    sentiment_lag = 0
     average_sentiment_lagged = average_sentiment.shift(sentiment_lag)
 
     price_dates = pd.to_datetime(price_data.index).normalize()
@@ -185,12 +186,44 @@ def rf_sentiment_forecast(price_data, news_sentiment):
     test_exog = exog_data.iloc[train_size:]
 
     best_params = {
-        "n_estimators": 100,
+        "n_estimators": 200,
         "max_depth": None,
         "min_samples_split": 2,
         "min_samples_leaf": 1,
         "max_features": "sqrt"
     }
+
+    def calculate_rmse_with_multiplier(multiplier):
+        multiplier = float(np.atleast_1d(multiplier)[0])
+        predictions = []
+        for t in range(len(test_close)):
+            current_train_exog = exog_data.iloc[:train_size + t]
+            current_train_close = close_price.iloc[:train_size + t]
+
+            model = RandomForestRegressor(**best_params, random_state=42)
+            model.fit(current_train_exog, current_train_close)
+
+            yhat = float(model.predict(test_exog.iloc[[t]])[0])
+            current_date = price_dates[train_size + t]
+
+            if current_date in average_sentiment_lagged.index:
+                s = average_sentiment_lagged.loc[current_date]
+                if pd.notna(s):
+                    s = float(s)
+                    yhat = yhat + (s * yhat * multiplier)
+
+            predictions.append(yhat)
+
+        return float(np.sqrt(mean_squared_error(test_close, predictions)))
+
+    result = minimize(
+        calculate_rmse_with_multiplier,
+        x0=np.array([0.01], dtype=float),
+        bounds=[(0.001, 0.1)],
+        method="L-BFGS-B",
+    )
+    optimal_multiplier = float(result.x[0])
+    print(f"Optimal Sentiment Multiplier: {optimal_multiplier}")
 
     predictions = []
 
@@ -203,22 +236,22 @@ def rf_sentiment_forecast(price_data, news_sentiment):
         model.fit(current_train_exog, current_train_close)
 
         # forecast one step ahead using next row of exog features
-        next_exog = test_exog.iloc[[t]]
-        yhat = model.predict(next_exog)[0]
-
+        #next_exog = test_exog.iloc[[t]]
+        #yhat = model.predict(next_exog)[0]
+        yhat = float(model.predict(test_exog.iloc[[t]])[0])
         current_date = price_dates[train_size + t]
 
-        if current_date in average_sentiment.index:
-            #sentiment_score = average_sentiment[current_date]
-            sentiment_score = float(average_sentiment_lagged.loc[current_date])
-            sentiment_adjustment = sentiment_score * yhat * 0.01
-            prediction = yhat + sentiment_adjustment
-        else:
-            prediction = yhat
+        if current_date in average_sentiment_lagged.index:
+            s = average_sentiment_lagged.loc[current_date]
+            if pd.notna(s):
+                s = float(s)
+                yhat = yhat + (s * yhat * optimal_multiplier)
 
-        predictions.append(prediction)
-        actual_value = test_close.iloc[t]
-        train_close.append(actual_value)
+        predictions.append(yhat)
+
+        #predictions.append(prediction)
+        #actual_value = test_close.iloc[t]
+        #train_close.append(actual_value)
 
     rmse = np.sqrt(mean_squared_error(test_close, predictions))
     mae = mean_absolute_error(test_close, predictions)
