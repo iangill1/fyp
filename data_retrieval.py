@@ -23,7 +23,7 @@ def price_retrieval(ticker, start_date, end_date, interval):
     data = data.asfreq("B")
     # forward fill missing data (holidays, etc)
     data = data.ffill()
-    print(data)
+    # print(data)
     return data
 
 
@@ -36,7 +36,7 @@ def price_retrieval_period(ticker, period, interval):
         data = data.asfreq("B")
         # forward fill missing data (holidays, etc)
         data = data.ffill()
-    print(data)
+    # print(data)
     return data
 
 
@@ -49,7 +49,7 @@ def price_retrieval_history(ticker, start_date, end_date, interval):
     df = df.asfreq("B")
     # forward fill missing data (holidays, etc)
     df = df.ffill()
-    print(df)
+    # print(df)
     return df
 
 
@@ -65,7 +65,7 @@ def finnhub_news_retrieval(ticker, start_date, end_date):
     # convert time to readable datetime
     df["datetime"] = pd.to_datetime(df["datetime"], unit="s")
     df = df[["datetime", "headline", "summary"]]
-    print(df)
+    # print(df)
     return df
 
 
@@ -100,7 +100,7 @@ def alpha_vantage_news_retrieval(ticker, start_date, end_date):
     # if neither title nor headline exist, create an empty headline column so selection below doesn't fail
     if "headline" not in df.columns:
         df["headline"] = None
-
+    # change name of column "time_published" to "datetime" for consistency
     if "time_published" in df.columns:
         df.rename(columns={"time_published": "datetime"}, inplace=True)
     if "datetime" not in df.columns:
