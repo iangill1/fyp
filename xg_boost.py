@@ -19,12 +19,12 @@ def xgboost_default_params_forecast(price_data):
 
     close_price = close_price.astype(float)
 
-    # define dependent features
+    # define independent features
     exog_features = ["Open", "High", "Low", "Volume"]
     available_features = [f for f in exog_features if f in data.columns]
 
     if not available_features:
-        raise ValueError("Data does not contain any dependent features (Open, High, Low, Volume)")
+        raise ValueError("Data does not contain any independent features (Open, High, Low, Volume)")
 
     exog_data = data[available_features].astype(float)
 
@@ -40,7 +40,7 @@ def xgboost_default_params_forecast(price_data):
     predictions = []
 
     for t in range(len(test_close)):
-        # dependent for training must match length of train_close
+        # independent for training must match length of train_close
         current_train_exog = exog_data.iloc[:train_size + t]
         current_train_close = close_price.iloc[:train_size + t]
 
@@ -75,12 +75,12 @@ def xgboost_tuned_forecast(price_data):
 
     close_price = close_price.astype(float)
 
-    # define dependent features
+    # define independent features
     exog_features = ["Open", "High", "Low", "Volume"]
     available_features = [f for f in exog_features if f in data.columns]
 
     if not available_features:
-        raise ValueError("Data does not contain any dependent features (Open, High, Low, Volume)")
+        raise ValueError("Data does not contain any independent features (Open, High, Low, Volume)")
 
     exog_data = data[available_features].astype(float)
 
@@ -117,7 +117,7 @@ def xgboost_tuned_forecast(price_data):
     predictions = []
 
     for t in range(len(test_close)):
-        # dependent for training must match length of train_close
+        # independent for training must match length of train_close
         current_train_exog = exog_data.iloc[:train_size + t]
         current_train_close = close_price.iloc[:train_size + t]
 
@@ -166,12 +166,12 @@ def xgboost_sentiment_forecast(price_data, news_sentiment):
 
     price_dates = pd.to_datetime(price_data.index).normalize()
 
-    # define dependent features
+    # define independent features
     exog_features = ["Open", "High", "Low", "Volume"]
     available_features = [f for f in exog_features if f in data.columns]
 
     if not available_features:
-        raise ValueError("Data does not contain any dependent features (Open, High, Low, Volume)")
+        raise ValueError("Data does not contain any independent features (Open, High, Low, Volume)")
 
     exog_data = data[available_features].astype(float)
 
@@ -226,7 +226,7 @@ def xgboost_sentiment_forecast(price_data, news_sentiment):
     predictions = []
 
     for t in range(len(test_close)):
-        # dependent for training must match length of train_close
+        # independent for training must match length of train_close
         current_train_exog = exog_data.iloc[:train_size + t]
         current_train_close = close_price.iloc[:train_size + t]
 
@@ -272,12 +272,12 @@ def xgboost_step_forecast(price_data):
 
     close_price = close_price.astype(float)
 
-    # define dependent features
+    # define independent features
     exog_features = ["Open", "High", "Low", "Volume"]
     available_features = [f for f in exog_features if f in data.columns]
 
     if not available_features:
-        raise ValueError("Data does not contain any dependent features (Open, High, Low, Volume)")
+        raise ValueError("Data does not contain any independent features (Open, High, Low, Volume)")
 
     exog_data = data[available_features].astype(float)
 
@@ -338,7 +338,7 @@ def xgboost_sentiment_step_forecast(price_data, news_sentiment, *, roll_window_d
     exog_features = ["Open", "High", "Low", "Volume"]
     available_features = [f for f in exog_features if f in data.columns]
     if not available_features:
-        raise ValueError("Data does not contain any dependent features (Open, High, Low, Volume)")
+        raise ValueError("Data does not contain any independent features (Open, High, Low, Volume)")
 
     exog_data = data[available_features].astype(float)
 

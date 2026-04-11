@@ -172,7 +172,7 @@ def arima_model_sentiment_forecast(price_data, news_sentiment):
     average_sentiment = news_data["sentiment_score"].groupby(news_data.index).mean()
 
     # Lag sentiment by N days so only use sentiment that would have been known earlier
-    sentiment_lag = 3
+    sentiment_lag = 0
     average_sentiment_lagged = average_sentiment.shift(sentiment_lag)
 
     # Normalised dates for the price series. Used to align sentiment with prices
@@ -282,6 +282,7 @@ def determine_differencing(price_data):
     close_price = train_data["Close"]
 
     ndiffs(close_price, test="adf")
+
 
 # Decompose the training series into trend, seasonal, and residual components.
 def decompose_time_series(price_data):
